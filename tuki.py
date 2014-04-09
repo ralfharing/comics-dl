@@ -33,7 +33,7 @@ def download_pages(pages, image_dir):
         ext = image.split('.')[-1]
         # rename the files so they're easily sorted
         new_name = series + '-' + page + '.' + ext.lower()
-        local_file = image_dir + '\\' + series + '\\' + new_name
+        local_file = image_dir + '/' + series + '/' + new_name
         r = requests.get(image)
         if r.ok:
             with open(local_file, 'wb') as f:
@@ -54,7 +54,7 @@ def main(**kwargs):
         if kwargs[flag]:
             print 'finding pages for', name
             find_pages(cover, 1, name, pages)
-            check_dir(image_dir + '\\' + name)
+            check_dir(image_dir + '/' + name)
     download_pages(pages, image_dir)
 
 if __name__ == '__main__':

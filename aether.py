@@ -48,7 +48,7 @@ def check_dir(dir):
 # pull out random pages and attempt to save them locally.
 # if that fails, put them back in the pool and try again.
 def download(pages):
-    image_dir = os.getcwd() + '\\lady_sabre_and_the_pirates_of_the_ineffable_aether\\'
+    image_dir = os.getcwd() + '/lady_sabre/'
     check_dir(image_dir)
     while pages:
         image, chapter, page = pages.pop()
