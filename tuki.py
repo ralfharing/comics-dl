@@ -4,7 +4,9 @@ import os
 import argparse
 
 # find and store the image on the current page
-# then drill down to the next page if there is one
+# then drill down to the next page if there is one.
+# each member of the returned set 'pages' is a tuple in
+# the format (image url, series name, page #)
 def find_pages(url, page, series, pages):
     r = requests.get(url)
     if r.ok:

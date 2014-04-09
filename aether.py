@@ -19,13 +19,13 @@ def find_chapters(url):
         print 'error1', r, url
     return chapters
 
-# each member of the returned set is a tuple in
+# each member of the returned set 'pages' is a tuple in
 # the format (image url, chapter #, page #)
 def find_pages(chapters):
     pages = set()
     for i,chapter in enumerate(chapters):
         page_num = 1
-        print 'checking chapter', i+1
+        print 'finding pages for chapter', i+1
         for page in chapter:
             r = requests.get(page)
             if r.ok:
