@@ -47,7 +47,7 @@ def check_dir(dir):
 
 # pull out random pages and attempt to save them locally.
 # if that fails, put them back in the pool and try again.
-def download(pages):
+def download_pages(pages):
     image_dir = os.getcwd() + '/lady_sabre/'
     check_dir(image_dir)
     while pages:
@@ -69,7 +69,7 @@ def main():
     archive = 'http://www.ineffableaether.com/archive'
     chapters = find_chapters(archive)
     pages = find_pages(chapters)
-    download(pages)
+    download_pages(pages)
 
 if __name__ == '__main__':
     main()
