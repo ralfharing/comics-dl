@@ -3,7 +3,7 @@ There are some webcomics and traditional comics publishers who offer samples (or
 
 * aether - [Lady Sabre & the Pirates of the Ineffable Aether][1] by Rick Burchett and Greg Rucka
 * elfquest - [ElfQuest][2] by Wendy and Richard Pini (and many others)
-* tuki - [Tüki][3] Save the Humans by Jeff Smith, also [Bone][4] and [Rasl][5]
+* tuki - [Tüki Save the Humans][3] by Jeff Smith, also [Bone][4] and [Rasl][5]
 
 [1]: http://www.ineffableaether.com/archive
 [2]: http://www.elfquest.com/gallery/OnlineComics3.html
