@@ -52,14 +52,14 @@ def download(pages):
     check_dir(image_dir)
     while pages:
         image, chapter, page = pages.pop()
-        ext = image.rsplit('.')[-1]
+        ext = image.split('.')[-1]
         # rename the files so they're easily sorted
         new_name = 'chapter-' + chapter + '-page-' + page + '.' + ext.lower()
         local_file = image_dir + new_name
         r = requests.get(image)
         if r.ok:
             with open(local_file, 'wb') as f:
-                print 'downloading', image.rsplit('/')[-1] + ' -> ' + new_name
+                print 'downloading', image.split('/')[-1] + ' -> ' + new_name
                 f.write(r.content)
         else:
             print 'error3', r, image
