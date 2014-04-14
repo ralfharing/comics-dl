@@ -56,6 +56,8 @@ lookup = {
 
 # exclude previous and thumbnail directories as well as misc other files
 def is_valid(entry):
+    # special case for one story which was never drawn
+    if entry == 'DisplayMEN5.html' return true
     ignore = ('Parent Directory', 'html', 'gif', 'tif', 'php', 'thumb/')
     return not entry.endswith(ignore)
 
@@ -95,6 +97,7 @@ def download_pages(pages):
         r = requests.get(image)
         if r.ok:
             with open(local_file, 'wb') as f:
+                # TODO: progress bars
                 print 'downloading', image.split('/')[-1] + ' -> ' + new_name
                 f.write(r.content)
         else:
