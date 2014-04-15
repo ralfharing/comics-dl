@@ -5,8 +5,12 @@ There are some webcomics and traditional comics publishers who offer samples (or
 * elfquest - [ElfQuest][2] by Wendy and Richard Pini (and many others)
 * tuki - [Tüki Save the Humans][3] by Jeff Smith, also [Bone][4] and [Rasl][5]
 
+requires [Beautiful Soup][6] (all) and [progressbar.py][7] (elfquest)
+
 [1]: http://www.ineffableaether.com/archive
 [2]: http://www.elfquest.com/gallery/OnlineComics3.html
 [3]: http://www.boneville.com/comic/tuki-season-one-cover
 [4]: http://www.boneville.com/comic/bone-issue-one-cover-2
 [5]: http://www.boneville.com/comic/rasl-issue-one-cover
+[6]: http://www.crummy.com/software/BeautifulSoup
+[7]: https://github.com/ikame/progressbar
