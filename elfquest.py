@@ -3,123 +3,148 @@ import requests
 import os
 from progressbar import AnimatedProgressBar
 
-lookup = {
-'OQ/' : {'dir' : '1. The Original Quest', 'pb' : 'OQ'},
-'SABM/' : {'dir' : '2. Siege at Blue Mountain', 'pb' : 'SABM'},
-'KOBW/' : {'dir' : '3. Kings of the Broken Wheel', 'pb' : 'KOBW'},
-'HY/' : {'dir' : '4. Hidden Years', 'pb' : 'HY'},
-'SH/' : {'dir' : '5. Shards', 'pb' : 'SH'},
-'NB/' : {'dir' : '6. New Blood', 'pb' : 'NB'},
-'TC/' : {'dir' : '7. Blood of Ten Chiefs', 'pb' : 'TC'},
-'KA/' : {'dir' : '8. Kahvi', 'pb' : 'KA'},
-'TS/' : {'dir' : '9. Two-Spear', 'pb' : 'TS'},
-'JK/' : {'dir' : '10. Jink', 'pb' : 'JK'},
-'RB/' : {'dir' : '11. The Rebels', 'pb' : 'RB'},
-'WD/' : {'dir' : '12. WaveDancers', 'pb' : 'WD'},
-'MET/' : {'dir' : '13. Metamorphosis', 'pb' : 'MET'},
-'EQ2/' : {'dir' : '14. ElfQuest volume 2 (by issue)', 'pb' : 'EQ2i'},
-'DT/' : {'dir' : '14. ElfQuest volume 2 (by story)/Dreamtime', 'pb' : 'EQ2s'},
-'DTC/' : {'dir' : '14. ElfQuest volume 2 (by story)/Dreamtime (color)', 'pb' : 'EQ2s'},
-'WH/' : {'dir' : '14. ElfQuest volume 2 (by story)/Wild Hunt', 'pb' : 'EQ2s'},
-'FE/' : {'dir' : '14. ElfQuest volume 2 (by story)/Fire-Eye', 'pb' : 'EQ2s'},
-'WDa/' : {'dir' : '14. ElfQuest volume 2 (by story)/WaveDancers', 'pb' : 'EQ2s'},
-'RC/' : {'dir' : '14. ElfQuest volume 2 (by story)/Rogue\'s Curse', 'pb' : 'EQ2s'},
-'FQ/' : {'dir' : '14. ElfQuest volume 2 (by story)/FutureQuest', 'pb' : 'EQ2s'},
-'WR/' : {'dir' : '14. ElfQuest volume 2 (by story)/Wolfrider!', 'pb' : 'EQ2s'},
-'MEN3/' : {'dir' : '14. ElfQuest volume 2 (by story)/Mender\'s Tale part 3', 'pb' : 'EQ2s'},
-'MEN4/' : {'dir' : '14. ElfQuest volume 2 (by story)/Mender\'s Tale part 4', 'pb' : 'EQ2s'},
-'MEN5/' : {'dir' : '14. ElfQuest volume 2 (by story)/Mender\'s Tale part 5', 'pb' : 'EQ2s'},
-'BS/' : {'dir' : '15. one shots/Bedtime Stories', 'pb' : 'os'},
-'FFJ/' : {'dir' : '15. one shots/The Jury', 'pb' : 'os'},
-'FFR/' : {'dir' : '15. one shots/Rogue\'s Curse', 'pb' : 'os'},
-'WP/' : {'dir' : '15. one shots/Worldpool', 'pb' : 'os'},
-'KC/' : {'dir' : '15. one shots/King\'s Cross', 'pb' : 'os'},
-'HS/' : {'dir' : '15. one shots/Homespun', 'pb' : 'os'},
-'WGA/' : {'dir' : '15. one shots/Courage, By Any Other Name', 'pb' : 'os'},
-'SS2WS/' : {'dir' : '16. Wolfshadow', 'pb' : 'WS'},
-'SS2REC/' : {'dir' : '17. Recognition/Recognition (part 1)', 'pb' : 'REC'},
-'SS2aREC/' : {'dir' : '17. Recognition/Recognition (parts 1 & 2)', 'pb' : 'REC'},
-'IABB/' : {'dir' : '18. In All But Blood', 'pb' : 'IABB'},
-'SAS/' : {'dir' : '19. The Searcher and the Sword', 'pb' : 'SAS'},
-'DISC/' : {'dir' : '20. The Discovery', 'pb' : 'DISC'},
-'EQFQ/' : {'dir' : '21. Final Quest prologue', 'pb' : 'FQ'},
-'ESS/' : {'dir' : 'misc/Essential ElfQuest', 'pb' : 'misc'},
-'WDX/' : {'dir' : 'misc/WaveDancers (lost chapters)', 'pb' : 'misc'},
-'HYC/' : {'dir' : 'misc/Hidden Years (color)', 'pb' : 'misc'},
-'KAC/' : {'dir' : 'misc/Kahvi (color)', 'pb' : 'misc'},
-'SHC/' : {'dir' : 'misc/Shards (color)', 'pb' : 'misc'},
-'ASH/' : {'dir' : 'misc/Hidden Years & Shards ashcan', 'pb' : 'misc'},
-'GOHO/' : {'dir' : 'misc/A Gift of Her Own', 'pb' : 'misc'},
-'PressWR94/' : {'dir' : 'misc/movie storyboards 1994', 'pb' : 'misc'},
-'PressWR95/' : {'dir' : 'misc/movie storyboards 1995', 'pb' : 'misc'},
-'XAN/' : {'dir' : 'misc/Xanth - Return to Centaur', 'pb' : 'misc'}
-}
+# all series have a url code, what the local path, the progress bar code.
+# some have issues and will then have an end length for how many.
+# most are formatted with leading zeroes, and sometimes there is a
+# special non-integer issue number.
+class Series:
+    def __init__(self, code, path, pb, issues=False, end=0, zeroes=True, special=''):
+        self.code = code
+        self.path = path
+        self.pb = pb
+        self.issues = issues
+        self.end = end
+        self.zeroes = zeroes
+        self.special = special
+    
+    def __repr__(self):
+        return 'Series({0}, \'{1}\')'.format(self.code, self.path)
+    
+    @property
+    def x(self):
+        return self._x
 
-progress_bar_names = {
-'OQ' : 'Original Quest',
-'SABM' : 'Siege at Blue Mountain',
-'KOBW' : 'Kings of the Broken Wheel',
-'HY' : 'Hidden Years',
-'SH' : 'Shards',
-'NB' : 'New Blood',
-'TC' : 'Blood of Ten Chiefs',
-'KA' : 'Kahvi',
-'TS' : 'Two-Spear',
-'JK' : 'Jink',
-'RB' : 'Rebels',
-'WD' : 'WaveDancers',
-'MET' : 'Metamorphosis',
-'EQ2i' : 'ElfQuest v2 (by issue)',
-'EQ2s' : 'ElfQuest v2 (by story)',
-'os' : 'one shots',
-'WS' : 'Wolfshadow',
-'REC' : 'Recognition',
-'IABB' : 'In All But Blood',
-'SAS' : 'Searcher and the Sword',
-'DISC' : 'Discovery',
-'FQ' : 'Final Quest',
-'misc' : 'misc'
-}
+# lookup what to label the progress bars
+progress_bar_names = {'OQ' : 'Original Quest',
+                      'SABM' : 'Siege at Blue Mountain',
+                      'KOBW' : 'Kings of the Broken Wheel',
+                      'HY' : 'Hidden Years',
+                      'SH' : 'Shards',
+                      'NB' : 'New Blood',
+                      'TC' : 'Blood of Ten Chiefs',
+                      'KA' : 'Kahvi',
+                      'TS' : 'Two-Spear',
+                      'JK' : 'Jink',
+                      'RB' : 'Rebels',
+                      'WD' : 'WaveDancers',
+                      'MET' : 'Metamorphosis',
+                      'EQ2i' : 'ElfQuest v2 (by issue)',
+                      'EQ2s' : 'ElfQuest v2 (by story)',
+                      'os' : 'one shots',
+                      'WS' : 'Wolfshadow',
+                      'REC' : 'Recognition',
+                      'IABB' : 'In All But Blood',
+                      'SAS' : 'Searcher and the Sword',
+                      'DISC' : 'Discovery',
+                      'FQ' : 'Final Quest',
+                      'misc' : 'misc'}
 
-# exclude previous and thumbnail directories as well as misc other files
-def is_valid(entry):
-    # special case for one story which was never drawn
-    if entry == 'DisplayMEN5.html': return True
-    ignore = ('Parent Directory', 'html', 'gif', 'tif', 'php', 'thumb/')
-    return not entry.endswith(ignore)
+# setup all the series and attributes
+def init_series():
+    series = set()
+    series.add(Series('OQ', '1. The Original Quest', 'OQ', True, 21))
+    series.add(Series('SABM', '2. Siege at Blue Mountain', 'SABM', True, 8))
+    series.add(Series('KOBW', '3. Kings of the Broken Wheel', 'KOBW', True, 9))
+    series.add(Series('HY', '4. Hidden Years', 'HY', True, 29, special='09.5'))
+    series.add(Series('SH', '5. Shards', 'SH', True, 16))
+    series.add(Series('NB', '6. New Blood', 'NB', True, 35, special='SS2'))
+    series.add(Series('TC', '7. Blood of Ten Chiefs', 'TC', True, 20))
+    series.add(Series('KA', '8. Kahvi', 'KA', True, 6))
+    series.add(Series('TS', '9. Two-Spear', 'TS', True, 5))
+    series.add(Series('JK', '10. Jink', 'JK', True, 12))
+    series.add(Series('RB', '11. The Rebels', 'RB', True, 12))
+    series.add(Series('WD', '12. WaveDancers', 'WD', True, 1))
+    series.add(Series('MET', '13. Metamorphosis', 'MET'))
+    series.add(Series('EQ2', '14. ElfQuest volume 2 (by issue)', 'EQ2i', True, 33))
+    series.add(Series('DT', '14. ElfQuest volume 2 (by story)/Dreamtime', 'EQ2s'))
+    series.add(Series('DTC', '14. ElfQuest volume 2 (by story)/Dreamtime (color)', 'EQ2s'))
+    series.add(Series('WH', '14. ElfQuest volume 2 (by story)/Wild Hunt', 'EQ2s'))
+    series.add(Series('FE', '14. ElfQuest volume 2 (by story)/Fire-Eye', 'EQ2s'))
+    series.add(Series('WDa', '14. ElfQuest volume 2 (by story)/WaveDancers', 'EQ2s'))
+    series.add(Series('RC', '14. ElfQuest volume 2 (by story)/Rogue\'s Curse', 'EQ2s'))
+    series.add(Series('FQ', '14. ElfQuest volume 2 (by story)/FutureQuest', 'EQ2s'))
+    series.add(Series('WR', '14. ElfQuest volume 2 (by story)/Wolfrider!', 'EQ2s'))
+    series.add(Series('MEN3', '14. ElfQuest volume 2 (by story)/Mender\'s Tale part 3', 'EQ2s'))
+    series.add(Series('MEN4', '14. ElfQuest volume 2 (by story)/Mender\'s Tale part 4', 'EQ2s'))
+    series.add(Series('BS', '15. one shots/Bedtime Stories', 'os'))
+    series.add(Series('FFJ', '15. one shots/The Jury', 'os'))
+    series.add(Series('FFR', '15. one shots/Rogue\'s Curse', 'os'))
+    series.add(Series('WP', '15. one shots/Worldpool', 'os'))
+    series.add(Series('KC', '15. one shots/King\'s Cross', 'os', True, 2, zeroes=False))
+    series.add(Series('HS', '15. one shots/Homespun', 'os'))
+    series.add(Series('WGA', '15. one shots/Courage, By Any Other Name', 'os'))
+    series.add(Series('SS2WS', '16. Wolfshadow', 'WS'))
+    series.add(Series('SS2REC', '17. Recognition/Recognition (part 1)', 'REC'))
+    series.add(Series('SS2aREC', '17. Recognition/Recognition (parts 1 & 2)', 'REC'))
+    series.add(Series('IABB', '18. In All But Blood', 'IABB'))
+    series.add(Series('SAS', '19. The Searcher and the Sword', 'SAS'))
+    series.add(Series('DISC', '20. The Discovery', 'DISC'))
+    series.add(Series('EQFQ', '21. Final Quest prologue', 'FQ'))
+    series.add(Series('ESS', 'misc/Essential ElfQuest', 'misc'))
+    series.add(Series('WDX', 'misc/WaveDancers (lost chapters)', 'misc'))
+    series.add(Series('HYC', 'misc/Hidden Years (color)', 'misc'))
+    series.add(Series('KAC', 'misc/Kahvi (color)', 'misc'))
+    series.add(Series('SHC', 'misc/Shards (color)', 'misc'))
+    series.add(Series('ASH', 'misc/Hidden Years & Shards ashcan', 'misc'))
+    series.add(Series('GOHO', 'misc/A Gift of Her Own', 'misc'))
+    series.add(Series('PressWR94', 'misc/movie storyboards 1994', 'misc'))
+    series.add(Series('PressWR95', 'misc/movie storyboards 1995', 'misc'))
+    series.add(Series('XAN', 'misc/Xanth - Return to Centaur', 'misc'))
+    return series
 
 # create dir path if it doesn't exist
 def check_dir(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-# each member of the returned set 'pages' is a tuple in
-# the format (image url, full local file path, progress bar key)
-def find_pages(local_dir, base_url, pages, is_root, pb_key=''):
-    r = requests.get(base_url)
+# perform the actual call to get the image urls from the xml
+def parse_images(url, path, pb, pages):
+    check_dir(path)
+    r = requests.get(url)
     if r.ok:
         soup = BeautifulSoup(r.content)
-        # filter out invalid entries in current dir
-        links = set(x['href'] for x in soup('a') if is_valid(''.join(x.stripped_strings)))
-        # separate into files and dirs
-        files = set(l for l in links if not l.endswith('/'))
-        dirs = links - files
-        for f in files:
-            pages.add((base_url + f, local_dir + f.lower(), pb_key))
-        for d in dirs:
-            # some code duplication but clearer this way
-            if is_root:
-                print 'finding pages for', lookup[d]['dir'].split('. ')[-1]
-                # rename the first level dirs so they're easily sorted
-                sub_dir = local_dir + lookup[d]['dir'] + '/'
-                check_dir(sub_dir)
-                find_pages(sub_dir, base_url + d, pages, False, lookup[d]['pb'])
-            else:
-                sub_dir = local_dir + d
-                check_dir(sub_dir)
-                find_pages(sub_dir, base_url + d, pages, False, pb_key)
+        images = [x['source'] for x in soup('image')]
+        for i in images:
+            f = i.rsplit('/', 1)[1].lower()
+            pages.add((i, path + f, pb))
     else:
-        print 'error1', r, base_url
+        print 'error1', r, url
+
+# each member of the set 'pages' is a tuple in the format
+# (image url, full local file path, progress bar key)
+def find_pages(series, local_dir, base_url):
+    pages = set()
+    for s in series:
+        print 'finding pages for', s.path.split('. ')[-1]
+        if s.issues:
+            # compensate for series where the issues have leading zeroes
+            width = 2 if s.zeroes else 1
+            issues = {str(x).zfill(width) for x in range(1, s.end + 1)}
+            # also add in non-integer issues
+            if s.special:
+                issues.add(s.special)
+            for i in issues:
+                url = base_url + s.code + '/' + s.code + i + '/'
+                path = local_dir + s.path + '/' + s.code + i + '/'
+                parse_images(url, path, s.pb, pages)
+        else:
+            url = base_url + s.code + '/'
+            path = local_dir + s.path + '/'
+            parse_images(url, path, s.pb, pages)
+    # one page is an html file instead of an image
+    check_dir(local_dir + '14. ElfQuest volume 2 (by story)/Mender\'s Tale part 5')
+    pages.add(('http://www.elfquest.com/gallery/OnlineComics/MEN5/DisplayMEN5.html', local_dir + '14. ElfQuest volume 2 (by story)/Mender\'s Tale part 5/displaymen5.html', 'EQ2s'))
+    return pages
 
 # creates an animated progress bar with the appropriate options
 def create_bar(key, files):
@@ -144,11 +169,11 @@ def download_pages(pages, progress_bar):
             pages.add((image, local_file, pb_key))
 
 def main():
-    base_url = 'http://www.elfquest.com/gallery/OnlineComics/'
-    image_dir = os.getcwd() + '/elfquest/'
-    pages = set()
-    find_pages(image_dir, base_url, pages, True)
-    progress_bars = {lookup[x]['pb'] for x in lookup}
+    series = init_series()
+    base_url = 'http://www.elfquest.com/comic_xml_zoom.php?fd=/gallery/OnlineComics/'
+    local_dir = os.getcwd() + '/elfquest/'
+    pages = find_pages(series, local_dir, base_url)
+    progress_bars = progress_bar_names.keys()
     for series in progress_bars:
         series_pages = {x for x in pages if x[2] == series}
         bar = create_bar(series, len(series_pages))
