@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import os
 from progressbar import AnimatedProgressBar
+from random import shuffle
 
 # all series have a url code, what the local path, the progress bar code.
 # some have issues and will then have an end length for how many.
@@ -113,7 +114,8 @@ def parse_images(url, path, pb, pages):
     r = requests.get(url)
     if r.ok:
         soup = BeautifulSoup(r.content)
-        images = [x['source'] for x in soup('image')]
+        # some stray links to directories are there so filter them out
+        images = [x['source'] for x in soup('image') if not x['source'].endswith('/')]
         for i in images:
             f = i.rsplit('/', 1)[1].lower()
             pages.add((i, path + f, pb))
@@ -173,11 +175,12 @@ def main():
     base_url = 'http://www.elfquest.com/comic_xml_zoom.php?fd=/gallery/OnlineComics/'
     local_dir = os.getcwd() + '/elfquest/'
     pages = find_pages(series, local_dir, base_url)
-    progress_bars = progress_bar_names.keys()
-    for series in progress_bars:
-        series_pages = {x for x in pages if x[2] == series}
-        bar = create_bar(series, len(series_pages))
-        download_pages(series_pages, bar)
+    groups = progress_bar_names.keys()
+    shuffle(groups)
+    for group in groups:
+        group_pages = {x for x in pages if x[2] == group}
+        bar = create_bar(group, len(group_pages))
+        download_pages(group_pages, bar)
         print '' # so the progress bars don't overwrite each other
 
 if __name__ == '__main__':
